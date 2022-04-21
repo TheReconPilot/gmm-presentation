@@ -4,11 +4,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Gaussian Mixture Models</title>
 
 		<link rel="stylesheet" href="dist/reset.css">
 		<link rel="stylesheet" href="dist/reveal.css">
 		<link rel="stylesheet" href="dist/theme/black.css">
+
+		<!-- Favicon -->
+		<link rel="icon" type="image/x-icon" href="media/favicon.ico">
 
 		<!-- Theme used for syntax highlighted code -->
 		<link rel="stylesheet" href="plugin/highlight/monokai.css">
@@ -16,8 +19,144 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+					<img data-src="media/logo.svg" width="50%">
+					<h2>Gaussian Mixture Models</h2>
+					Purva Parmar
+				</section>
+				<section>
+					<section>
+					<h2>Introduction</h2>
+					<ul>
+						<li>GMMs represent <span style="color: lime;">normally distributed subpopulations</span> within an overall population</li>
+						<li>Also used for clustering problems</li>
+						<li>Can be thought of as an extension to K-Means</li>
+					</ul>
+					</section>
+					<section>
+						<h3>GMM as an extension to K-Means</h3>
+						<p class="fragment">K-Means is a <strong>hard clustering</strong> method: it assigns each data point to a fixed cluster</p>
+						<p class="fragment">GMM is a <strong>soft clustering</strong> method: it assigns each data point a probability of belonging to each of the clusters</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>GMM - The Mathematical Form</h2>
+						<div class="fragment">
+							<p>GMM is a mixture of normal distributions</p>
+							\[
+								P(\bold{x}) = \sum_{k=1}^{K} \pi_k \mathcal{N}(\bold{x} | \bold{\mu}_k, \bold{\Sigma}_k) 
+							\]
+						</div>
+						<div class="fragment">
+							<ul>
+								<li>$\bold{x}$ is a $d$-dimensional data point / observation</li>
+								<li>K is the number of clusters/mixtures</li>
+								<li>$\pi_k$ is the proportion of each cluster</li>
+								<li>$\mathcal{N}(\bold{x} | \bold{\mu}_k, \bold{\Sigma}_k)$ is the Multivariate Normal</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<h3>Proportions</h3>
+						<p>$\pi_k$ represent the proportions, essentially how big the cluster $k$ is in the mixture</p>
+						<p>The proportions must sum to 1</p>
+						\[
+							\sum_{k=1}^K \pi_k = 1
+						\]
+					</section>
+					<section>
+						<h3>Multivariate Normal Distribution</h3>
+						\[
+							\small{
+							\mathcal{N}(\bold{x} | \bold{\mu}, \bold{\Sigma}) = \frac{1}{\sqrt{\text{det}(2\pi\bold{\Sigma})}} \exp\left(-\frac{1}{2}(\bold{x} - \bold{\mu})^\intercal \bold{\Sigma}^{-1} (\bold{x} - \bold{\mu})\right)
+							}
+						\]
+						<ul>
+							<li>$\bold{\mu} \in \mathbb{R}^{d}$ is the mean</li>
+							<li>$\bold{\Sigma} \in \mathbb{R}^{d \times d}$ is the covariance matrix</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<h2>Responsibilities / The Gamma Matrix</h2>
+					\[
+						\boxed{
+						\gamma(z_{nk}) = \frac{\pi_k \mathcal{N}(\bold{x}_n | \bold{\mu}_k \bold{\Sigma}_k)}{\sum_{j=1}^{K} \pi_j \mathcal{N}(\bold{x}_n | \bold{\mu}_j \bold{\Sigma}_j)}
+						}		
+					\]
+					<p>
+						$\gamma(z_{nk})$ represents the probability of the $n^{th}$ observation belonging to the $k^{th}$ cluster.
+					</p>
+				</section>
+				<section>
+					<h2>Clustering with GMM</h2>
+					<p>Fit K clusters to N observations, each of which may be $d$-dimensional</p>
+					<p>We want:</p>
+					<ul>
+						<li>Mean ($\bold{\mu_k}$), Covariance ($\bold{\Sigma_k}$) and Proportion ($\pi_k$) of each cluster $k$</li>
+						<li>$\gamma(z_{nk})$: probability of an observation $n$ belonging to cluster $k$</li>
+					</ul>
+				</section>
+				<section>
+					<section>
+						<h2>Expectation Maximization (EM)</h2>
+					</section>
+					<section>
+						<h3>The Need for EM</h3>
+						<p>For a complete observation set $\bold{X}$ containing $N$ observations, we have:</p>
+						<div class="fragment">
+							\[
+								P(\bold{X}) = \prod_{n=1}^{N} \blue{P(\bold{x_n})} = \prod_{n=1}^{N} \blue{\sum_{k=1}^{K} \pi_k \mathcal{N}(\bold{x}_n | \bold{\mu}_k, \bold{\Sigma}_k)}
+							\]
+						</div>
+						<div class="fragment fade-up">
+							\[
+								\implies \ln P(\bold{X}) = \sum_{n=1}^{N} \ln \sum_{k=1}^{K} \pi_k \mathcal{N}(\bold{x}_n | \bold{\mu}_k, \bold{\Sigma}_k)
+							\]
+						</div>
+					</section>
+					<section>
+						<h3>The Need for EM</h3>
+						<p>Using a gradient based optimizer would require computing a derivative, and we have a summation inside the log.</p>
+						<div class="fragment">
+							<p>There are also other <strong>constraints</strong> to take care of, like</p>
+							<ul>
+								<li>Proportions ($\pi_k$) must sum to 1</li>
+								<li>Covariance matrices must be positive semi-definite</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<h3>The EM Method</h3>
+						We first initialize our parameters. We can initialize randomly or use K-Means as a starting point.
+						<p><strong>The E step:</strong> Infer missing values from observations</p>
+						<p><strong>The M step:</strong> Optimize parameters using the "filled in" values in the E step</p>
+					</section>
+					<section>
+						<h3>Expectation Step</h3>
+						<p>In theory, the expectation step involves "expected complete data log likelihood", which is just an expectation over the data given the parameters.</p>
+						<p>In practice, however, we only need to compute the responsibilities: $\gamma(z_{nk})$</p>
+						\[
+							\gamma(z_{nk}) = \frac{\pi_k \mathcal{N}(\bold{x}_n | \bold{\mu}_k \bold{\Sigma}_k)}{\sum_{j=1}^{K} \pi_j \mathcal{N}(\bold{x}_n | \bold{\mu}_j \bold{\Sigma}_j)}
+						\]
+					</section>
+					<section>
+						<h3>Maximization Step</h3>
+						<p>We use the responsibilities ($\gamma(z_{nk}$) to compute optimal values of parameters</p>
+						<span class="fragment">$\pi_k^* = \frac{1}{N} \sum_{n=1}^{N} \gamma(z_{nk})\qquad$</span><span class="fragment">$\bold{\mu}_k^* = \frac{\sum_{n=1}^N \gamma(z_{nk}) \bold{x}_n}{\sum_{n=1}^N \gamma(z_{nk})}$</span>
+
+						<div class="fragment fade-up">
+							\[
+								\bold{\Sigma}_k^* = \frac{\sum_{n=1}^N \gamma(z_{nk}) (\bold{x}_n - \bold{\mu}_k)(\bold{x}_n - \bold{\mu}_k)^\intercal}{\sum_{n=1}^N \gamma(z_{nk})}
+							\]
+						</div>
+					</section>
+					<section>
+						<h3>The EM Algorithm</h3>
+						<p>We alternate between the E step and the M step for many iterations, until the log likelihood $\ln P(\bold{X})$ converges.</p>
+					</section>
+				</section>
 			</div>
 		</div>
 
