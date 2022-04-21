@@ -157,6 +157,154 @@
 						<p>We alternate between the E step and the M step for many iterations, until the log likelihood $\ln P(\bold{X})$ converges.</p>
 					</section>
 				</section>
+				<section>
+					<section>
+						<h3>Metrics: Rand Score/Index and Adjusted Rand Score/Index</h3>
+						\[
+							\blue{\textsf{Rand Index} = \frac{\textsf{Number of agreeing pairs}}{\textsf{Number of pairs}}}
+						\]
+						<div class="fragment">
+							<p>The raw RI score is then adjusted for chance into the ARI score</p>
+							\[
+								\green{\textsf{ARI} = \frac{\textsf{RI - Expected RI}}{\textsf{Max RI - Expected RI}}}
+							\]
+						</div>
+					</section>
+					<section>
+						<h3>The Adjusted Rand Score</h3>
+						<p>We use the ARI (or ARS) as it is a better measure.</p>
+						<ul>
+							<li>ARI is close to 0 for random labeling independently of the number of clusters and observations</li>
+							<li>ARI = 1 when the clusterings are identical (up to a permutation)</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<h1>Experiments</h1>
+				</section>
+				<section>
+					<section>
+						<h3>(1) N = 1000, K = 3, D = 1, Fixed Variance</h3>
+						<ul>
+							<li>1000 runs (data files)</li>
+							<li>Each run had 1000 observations, all univariate</li>
+							<li>K = 3 clusters</li>
+						</ul>
+						<p>GMM with EM was done in 2 modes:</p>
+						<ol>
+							<li>Best of 10 Random Initializations</li>
+							<li>K-Means Initialization</li>
+						</ol>
+					</section>
+					<section>
+						<h3>ARS Histogram</h3>
+						<img data-src="media/figure-1.png">
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						In the 1000 files / runs:
+						<ul>
+							<li><span style="color: limegreen">GMM with Best of 10 Random Inits</span> performed equal or better than <span style="color: red">standard K-Means</span> around <span style="color: yellow">83.9%</span> of the time.</li>
+							<li><span style="color: limegreen">GMM with K-Means Init</span> performed equal or better than <span style="color: red">standard K-Means</span> around <span style="color: yellow">90.1%</span> of the time.</li>
+							<li>Within the GMM itself, <span style="color: limegreen">K-Means Init</span> performed equal or better than <span style="color: red">Best of 10 Random Inits</span> around <span style="color: yellow">60.1%</span> of the time.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						<img data-src="media/box-1.png">
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						<img data-src="media/box-2.png">
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>(2) N = 1000, K = 2, D = 1, Same Mean, Different Variance</h3>
+						<ul>
+							<li>1000 runs (data files)</li>
+							<li>Each run had 1000 observations, all univariate</li>
+							<li>K = 2 clusters, with same mean but different variances</li>
+						</ul>
+						<p>GMM with EM was done in 2 modes:</p>
+						<ol>
+							<li>Best of 10 Random Initializations</li>
+							<li>K-Means Initialization</li>
+						</ol>
+					</section>
+					<section>
+						<h3>ARS vs Difference of StdDev of 2 clusters</h3>
+						<img data-src="media/figure-2.png">
+					</section>
+					<section>
+						<h3>ARS Histogram</h3>
+						<img data-src="media/figure-3.png">
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						In the 1000 files / runs:
+						<ul>
+							<li><span style="color: limegreen">GMM with Best of 10 Random Inits</span> performed equal or better than <span style="color: red">standard K-Means</span> around <span style="color: yellow">92.2%</span> of the time.</li>
+							<li><span style="color: limegreen">GMM with K-Means Init</span> performed equal or better than <span style="color: red">standard K-Means</span> around <span style="color: yellow">63.6%</span> of the time.</li>
+							<li>Within the GMM itself, <span style="color: limegreen">K-Means Init</span> performed equal or better than <span style="color: red">Best of 10 Random Inits</span> around <span style="color: yellow">74.2%</span> of the time.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						<img data-src="media/box-3.png">
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						<img data-src="media/box-4.png">
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>(3) N = 1000, K = 5, D = 3 [Multivariate]</h3>
+							<ul>
+								<li>1000 runs (data files)</li>
+								<li>Each run had 1000 observations, each 3-dimensional</li>
+								<li>K = 5 clusters</li>
+							</ul>
+							<p>GMM with EM was done with a K-Means initialization</p>
+					</section>
+					<section>
+						<h3>ARS Histogram</h3>
+						<img data-src="media/figure-4.png">
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						<img data-src="media/box-5.png">
+					</section>
+					<section>
+						<h3>Comparing Methods</h3>
+						<p>In the 1000 files run, <span style="color: limegreen">GMM</span> performed better than <span style="color: red">standard K-Means</span> in <span style="color:lime">997</span> files</p>
+						<p>The only 3 files where K-Means performed better had some clusters with abnormally low points, like 1 or 2 only</p>
+					</section>
+				</section>
+				<section>
+					<h2>Possible Future Work</h2>
+					<ul>
+						<li>Comparing Random Initialization with K-Means Initialization in the Multivariate Case</li>
+						<li>Comparing the EM method with the Gibbs Sampler</li>
+						<li>Figuring out number of clusters K when it is unknown</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Acknowledgements</h2>
+					<ul>
+						<li>More details on <a href="https://thereconpilot.github.io/gaussian-mixture-models/">Gaussian Mixture Models - Semester Project Site</a></li>
+						<li>Math with <a href="https://katex.org/">$\KaTeX$</a></li>
+						<li>Slides made with <a href="https://revealjs.com/">reveal.js</a></li>
+						<li>Plots with Matplotlib, <a href="https://plotly.com/python/">Plotly</a></li>
+						<li><a href="https://github.com/dunovank/jupyter-themes">jupyter-themes</a> for the Monokai themed matplotlib plots</li>
+						<li>PARAM Brahma under the National Supercomputing Mission, Govt of India at IISER Pune</li>
+					</ul>
+				</section>
+				<section>
+					These slides can be found on GitHub:
+					<a href="https://github.com/TheReconPilot/gmm-presentation/">TheReconPilot/gmm-presentation</a>
+				</section>
 			</div>
 		</div>
 
